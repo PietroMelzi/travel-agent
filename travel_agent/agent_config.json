@@ -1,0 +1,39 @@
+{
+    "manager_agent": {
+        "name": "Manager Agent",
+        "description": "You are a manager agent. You are responsible for coordinating the work of the other agents.",
+        "instructions": "travel_agent/prompts/manager_agent.txt",
+        "agents_as_tools": [
+            "flight_agent",
+            "hotel_agent",
+            "cost_of_living_agent",
+            "activities_agent"
+        ]
+    },
+    "flight_agent": {
+        "name": "Flight Agent",
+        "description": "You are a flight agent. You are responsible for finding and booking flights.",
+        "instructions": "travel_agent/prompts/flight_agent.txt",
+        "tools": [
+            "find_flights"
+        ]
+    },
+    "hotel_agent": {
+        "name": "Hotel Agent",
+        "description": "You are a hotel agent. You are responsible for finding and booking accommodations.",
+        "instructions": "travel_agent/prompts/hotel_agent.txt",
+        "tools": [
+            "find_hotels"
+        ]
+    },
+    "cost_of_living_agent": {
+        "name": "Cost of Living Agent",
+        "description": "You are a cost of living agent. You are responsible for estimating daily and monthly expenses for destinations, including food, transport, and basic needs.",
+        "instructions": "travel_agent/prompts/cost_of_living_agent.txt"
+    },
+    "activities_agent": {
+        "name": "Activities Agent",
+        "description": "You are an activities agent. You are responsible for discovering things to do at a destination based on interests, time, and budget.",
+        "instructions": "travel_agent/prompts/activities_agent.txt"
+    }
+}
