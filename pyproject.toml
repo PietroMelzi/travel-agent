@@ -9,7 +9,12 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "openai-agents (>=0.6.5,<0.7.0)",
-    "dotenv (>=0.9.9,<0.10.0)"
+    "dotenv (>=0.9.9,<0.10.0)",
+    "serpapi (>=0.1.5,<0.2.0)",
+    "pandas (>=2.3.3,<3.0.0)",
+    "google-search-results (>=2.4.2,<3.0.0)",
+    "wandb (>=0.24.0,<0.25.0)",
+    "weave (>=0.52.25,<0.53.0)",
 ]
 
 

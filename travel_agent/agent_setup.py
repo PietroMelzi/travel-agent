@@ -1,5 +1,8 @@
+import logging
 from agents import Agent
 from travel_agent.tools.tool_definition import map_tool_name_to_function
+
+log = logging.getLogger(__name__)
 
 
 def _sanitize_tool_name(name: str) -> str:
@@ -24,8 +27,9 @@ def _sanitize_tool_name(name: str) -> str:
 
 def create_agent(multi_agent_specs: dict, agent_key: str) -> Agent:
     agent_specs = multi_agent_specs[agent_key]
+    log.info("Creating agent: %s", agent_specs.get("name", agent_key))
 
-    agents_as_tools = [create_agent(multi_agent_specs, agent_key) for agent_key in agent_specs.get("agents_as_tools", [])]
+    agents_as_tools = [create_agent(multi_agent_specs, key) for key in agent_specs.get("agents_as_tools", [])]
     agents_as_tools = [tool.as_tool(
         tool_name=_sanitize_tool_name(tool.name),
         tool_description=multi_agent_specs[key]["description"]
