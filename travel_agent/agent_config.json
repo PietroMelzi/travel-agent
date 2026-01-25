@@ -29,7 +29,10 @@
     "cost_of_living_agent": {
         "name": "Cost of Living Agent",
         "description": "You are a cost of living agent. You are responsible for estimating daily and monthly expenses for destinations, including food, transport, and basic needs.",
-        "instructions": "travel_agent/prompts/cost_of_living_agent.txt"
+        "instructions": "travel_agent/prompts/cost_of_living_agent.txt",
+        "tools": [
+            "find_cost_of_living"
+        ]
     },
     "activities_agent": {
         "name": "Activities Agent",

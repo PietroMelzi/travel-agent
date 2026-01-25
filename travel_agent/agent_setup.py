@@ -1,6 +1,6 @@
 import logging
 from agents import Agent
-from travel_agent.tools.tool_definition import map_tool_name_to_function
+from travel_agent.tools.tool_mapping import map_tool_name_to_function
 
 log = logging.getLogger(__name__)
 
