@@ -2,9 +2,7 @@
 
 A travel assistant that helps with flights, hotels, cost of living, and more.
 
-## Running locally
-
-Activate the Poetry environment (`poetry shell` or `poetry run`), then run `python main.py`.
+## Setup the Environment
 
 Add a `.env` file in the project root with:
 
@@ -18,7 +16,13 @@ WANDB_API_KEY=<your-key>   # only if you want logging
 
 `WANDB_API_KEY` is optional and only required if you want Weights & Biases logging.
 
-## APIs
+## Running locally
+
+Activate the Poetry environment (`poetry shell` or `poetry run`), then run:
+- `streamlit run app.py` for streamlit UI
+- `python main.py` for CMD line interface
+
+## Used APIs
 
 - **Flights:** [SerpAPI](https://serpapi.com/) — [Google Flights API](https://serpapi.com/google-flights-api) and [Autocomplete API](https://serpapi.com/google-flights-autocomplete-api).
 - **Cost of living:** [RapidAPI](https://rapidapi.com/) — [Cost of Living and Prices](https://rapidapi.com/traveltables/api/cost-of-living-and-prices), updated to 2023.

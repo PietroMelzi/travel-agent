@@ -1,16 +1,11 @@
 import asyncio
 import json
 import logging
-from collections import deque
-from datetime import datetime, timezone
-
 import weave
-from dotenv import load_dotenv
-from agents import InputGuardrail, Runner
+from collections import deque
+from utils import build_message_with_history, load_agent
+from agents import Runner
 from agents.exceptions import InputGuardrailTripwireTriggered
-
-from travel_agent.agent_setup import create_agent
-from travel_agent.input_guardrails import travel_guardrail
 
 logging.basicConfig(
     level=logging.INFO,
@@ -23,28 +18,6 @@ try:
     weave.init("travel-agent")
 except Exception as e:
     log.warning("Weave init skipped: %s", e)
-
-
-def build_message_with_history(history: deque[tuple[str, str]], new_input: str) -> str:
-    """Build the message to send to the LLM: current time, last 5 turns, and the new user input."""
-    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-    parts = [f"Current time: {now}"]
-    if history:
-        parts.append("\n\nPrevious conversation:")
-        for user, assistant in history:
-            parts.append(f"\n\nYou: {user}")
-            parts.append(f"\nAssistant: {assistant}")
-    parts.append(f"\n\nYou: {new_input}")
-    return "".join(parts)
-
-
-def _load_agent():
-    load_dotenv()
-    with open("travel_agent/agent_config.json", encoding="utf-8") as f:
-        agent_config = json.load(f)
-    manager_agent = create_agent(agent_config, "manager_agent")
-    # manager_agent.input_guardrails = [InputGuardrail(guardrail_function=travel_guardrail)]
-    return manager_agent
 
 
 async def main(agent):
@@ -76,7 +49,7 @@ async def main(agent):
 
 if __name__ == "__main__":
     try:
-        manager_agent = _load_agent()
+        manager_agent = load_agent()
     except FileNotFoundError as e:
         log.error("Agent config file not found: %s", e)
         raise SystemExit(1) from e

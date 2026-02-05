@@ -15,6 +15,7 @@ dependencies = [
     "google-search-results (>=2.4.2,<3.0.0)",
     "wandb (>=0.24.0,<0.25.0)",
     "weave (>=0.52.25,<0.53.0)",
+    "streamlit (>=1.54.0,<2.0.0)",
 ]
 
 

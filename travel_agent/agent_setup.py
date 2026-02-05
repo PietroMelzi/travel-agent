@@ -54,4 +54,5 @@ def create_agent(multi_agent_specs: dict, agent_key: str) -> Agent:
         instructions=agent_specs["instructions"],
         tools=agents_as_tools + tools,
         handoffs=handoffs,
+        model="gpt-4.1",
     )
