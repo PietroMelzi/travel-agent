@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 
 
 @function_tool
-def find_flights(departure: str, arrival: str, departure_date: str, return_date: str) -> Tuple[str, str]:
+def find_flights(departure: str, arrival: str, departure_date: str, return_date: str) -> str:
     """
     Find flights to a destination
 
@@ -23,16 +23,14 @@ def find_flights(departure: str, arrival: str, departure_date: str, return_date:
         return_date: The return date of the flight
 
     Returns:
-        Tuple of (one_way_result, return_result).
-        - one_way_result: Raw response from the initial Google Flights API search (outbound).
-        - return_result: If the first response contains a non-empty best_flight array,
-          the raw response from a follow-up search with departure_token (return leg);
-          otherwise None.
+        JSON: {"options": [{"outbound": <outbound_flight>, "return": <return_flight>}]}
     """
     log.info(
         "find_flights: departure=%s, arrival=%s, departure_date=%s, return_date=%s",
         departure, arrival, departure_date, return_date,
     )
+
+    # get the location kgmid for the departure and arrival cities
     departure_id = get_location_kgmid(departure)
     arrival_id = get_location_kgmid(arrival)
     log.info("Location kgmids: departure=%s, arrival=%s", departure_id, arrival_id)
@@ -59,29 +57,48 @@ def find_flights(departure: str, arrival: str, departure_date: str, return_date:
         "deep_search": True
     }
 
+    # if return_date is provided, add it to the parameters and set the type to 1 (round-tripy)
+    # otherwise, set the type to 2 (one-way)
     if return_date:
         params = {**params, "return_date": return_date, "type": "1"}
     else:
         params = {**params, "type": "2"}
 
     try:
+        max_options = 3
         search = GoogleSearch(params)
         results = search.get_dict()
         log.info("Google Flights API response received")
 
         outbound = (results.get("best_flights") or results.get("other_flights")) if isinstance(results, dict) else None
         if outbound and isinstance(outbound, list) and len(outbound) > 0:
-            first = outbound[0]
-            departure_token = first.get("departure_token") if isinstance(first, dict) else None
-            if departure_token:
-                params2 = {**params, "departure_token": departure_token}
-                search2 = GoogleSearch(params2)
-                second_results = search2.get_dict()
-                log.info("Google Flights API follow-up response received (departure_token)")
-                return_flights = (second_results.get("best_flights") or second_results.get("other_flights")) if isinstance(second_results, dict) else None
-                return (outbound, return_flights)
 
-        return (outbound, None)
+            # get information about the return flights if departure_token is provided for each outbound flight
+            options = []
+            for out_flight in outbound[:max_options]:
+                option = {
+                    "outbound": out_flight,
+                    "return": None
+                }
+                departure_token = out_flight.get("departure_token") if isinstance(out_flight, dict) else None
+                
+                # get information about the return flights
+                if departure_token:
+                    params2 = {**params, "departure_token": departure_token}
+                    search2 = GoogleSearch(params2)
+                    second_results = search2.get_dict()
+                    log.info("Google Flights API follow-up response received (departure_token)")
+                    
+                    return_flights = (second_results.get("best_flights") or second_results.get("other_flights")) if isinstance(second_results, dict) else None
+
+                    if return_flights and isinstance(return_flights, list) and len(return_flights) > 0:
+                        option["return"] = return_flights[0]
+
+                options.append(option)
+            return json.dumps({"options": options}, indent=2)
+
+        return "No flights found. Please check the city names and dates."
+
     except Exception as e:
         log.exception("Google Flights API error: %s", e)
         return f"Error while searching for flights: {e!s}. Please try again later."
@@ -141,10 +158,10 @@ def find_hotels(city: str, country_code: str, check_in_date: str, check_out_date
     if response.status_code != 200:
         return f"Hotel search failed: API returned {response.status_code}. {data.get('message', data.get('error', ''))}"
 
-    # Build id -> name from hotels array (same shape as a.json)
+    # Build id -> name from hotels array
     hotels_arr = data.get("hotels") or []
     hotels_map = {
-        str(h["id"]): h.get("name", "—")
+        str(h["id"]): h.get("name", "N/A")
         for h in hotels_arr
         if isinstance(h, dict) and h.get("id") is not None
     }
@@ -164,12 +181,12 @@ def find_hotels(city: str, country_code: str, check_in_date: str, check_out_date
             if not isinstance(rt, dict):
                 continue
             rates = rt.get("rates") or []
-            rname = rates[0].get("name") if rates and isinstance(rates[0], dict) else "Room"
+            rname = rates[0].get("name") if rates and isinstance(rates[0], dict) else "N/A"
             offer = rt.get("offerRetailRate") or {}
             amount = offer.get("amount")
             if amount is None:
                 continue
-            currency = offer.get("currency") or "EUR"
+            currency = offer.get("currency")
             rooms.append({"name": rname, "price": amount, "currency": currency})
         if rooms:
             out.append({"id": hid, "name": hname, "rooms": rooms})

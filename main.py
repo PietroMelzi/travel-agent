@@ -2,7 +2,7 @@ import asyncio
 import json
 import logging
 from collections import deque
-from datetime import datetime
+from datetime import datetime, timezone
 
 import weave
 from dotenv import load_dotenv
@@ -28,7 +28,7 @@ def build_message_with_history(
     history: deque[tuple[str, str]], new_input: str
 ) -> str:
     """Build the message to send to the LLM: current time, last 5 turns, and the new user input."""
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     parts = [f"Current time: {now}"]
     if history:
         parts.append("\n\nPrevious conversation:")

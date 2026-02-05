@@ -6,8 +6,7 @@
         "agents_as_tools": [
             "flight_agent",
             "hotel_agent",
-            "cost_of_living_agent",
-            "activities_agent"
+            "cost_of_living_agent"
         ]
     },
     "flight_agent": {
