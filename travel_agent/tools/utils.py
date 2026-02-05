@@ -56,7 +56,6 @@ def get_location_kgmid(city: str) -> Optional[str]:
         log.error("SERP_API_KEY environment variable is not set")
         return "Flight search is not configured: missing SERP_API_KEY. Please set it in your environment."
 
-
     params = {
         "engine": "google_flights_autocomplete",
         "q": city.strip(),

@@ -12,7 +12,9 @@ log = logging.getLogger(__name__)
 
 
 @function_tool
-def find_flights(departure: str, arrival: str, departure_date: str, return_date: str) -> str:
+def find_flights(
+    departure: str, arrival: str, departure_date: str, return_date: str
+) -> str:
     """
     Find flights to a destination
 
@@ -27,7 +29,10 @@ def find_flights(departure: str, arrival: str, departure_date: str, return_date:
     """
     log.info(
         "find_flights: departure=%s, arrival=%s, departure_date=%s, return_date=%s",
-        departure, arrival, departure_date, return_date,
+        departure,
+        arrival,
+        departure_date,
+        return_date,
     )
 
     # get the location kgmid for the departure and arrival cities
@@ -54,7 +59,7 @@ def find_flights(departure: str, arrival: str, departure_date: str, return_date:
         "currency": "EUR",
         "outbound_date": departure_date,
         "api_key": api_key,
-        "deep_search": True
+        "deep_search": True,
     }
 
     # if return_date is provided, add it to the parameters and set the type to 1 (round-tripy)
@@ -70,28 +75,45 @@ def find_flights(departure: str, arrival: str, departure_date: str, return_date:
         results = search.get_dict()
         log.info("Google Flights API response received")
 
-        outbound = (results.get("best_flights") or results.get("other_flights")) if isinstance(results, dict) else None
+        outbound = (
+            (results.get("best_flights") or results.get("other_flights"))
+            if isinstance(results, dict)
+            else None
+        )
         if outbound and isinstance(outbound, list) and len(outbound) > 0:
-
             # get information about the return flights if departure_token is provided for each outbound flight
             options = []
             for out_flight in outbound[:max_options]:
-                option = {
-                    "outbound": out_flight,
-                    "return": None
-                }
-                departure_token = out_flight.get("departure_token") if isinstance(out_flight, dict) else None
-                
+                option = {"outbound": out_flight, "return": None}
+                departure_token = (
+                    out_flight.get("departure_token")
+                    if isinstance(out_flight, dict)
+                    else None
+                )
+
                 # get information about the return flights
                 if departure_token:
                     params2 = {**params, "departure_token": departure_token}
                     search2 = GoogleSearch(params2)
                     second_results = search2.get_dict()
-                    log.info("Google Flights API follow-up response received (departure_token)")
-                    
-                    return_flights = (second_results.get("best_flights") or second_results.get("other_flights")) if isinstance(second_results, dict) else None
+                    log.info(
+                        "Google Flights API follow-up response received (departure_token)"
+                    )
 
-                    if return_flights and isinstance(return_flights, list) and len(return_flights) > 0:
+                    return_flights = (
+                        (
+                            second_results.get("best_flights")
+                            or second_results.get("other_flights")
+                        )
+                        if isinstance(second_results, dict)
+                        else None
+                    )
+
+                    if (
+                        return_flights
+                        and isinstance(return_flights, list)
+                        and len(return_flights) > 0
+                    ):
                         option["return"] = return_flights[0]
 
                 options.append(option)
@@ -105,7 +127,13 @@ def find_flights(departure: str, arrival: str, departure_date: str, return_date:
 
 
 @function_tool
-def find_hotels(city: str, country_code: str, check_in_date: str, check_out_date: str, occupancies: int = 2) -> str:
+def find_hotels(
+    city: str,
+    country_code: str,
+    check_in_date: str,
+    check_out_date: str,
+    occupancies: int = 2,
+) -> str:
     """
     Find hotels in a destination
 
@@ -121,7 +149,11 @@ def find_hotels(city: str, country_code: str, check_in_date: str, check_out_date
     """
     log.info(
         "find_hotels: city=%s, country_code=%s, check_in=%s, check_out=%s, occupancies=%s",
-        city, country_code, check_in_date, check_out_date, occupancies,
+        city,
+        country_code,
+        check_in_date,
+        check_out_date,
+        occupancies,
     )
     api_key = os.getenv("LITE_API_KEY")
     if not api_key:
@@ -138,7 +170,7 @@ def find_hotels(city: str, country_code: str, check_in_date: str, check_out_date
         "cityName": city,
         "countryCode": country_code,
         "limit": 50,
-        "maxRatesPerHotel": 5
+        "maxRatesPerHotel": 5,
     }
     headers = {
         "accept": "application/json",
@@ -181,7 +213,9 @@ def find_hotels(city: str, country_code: str, check_in_date: str, check_out_date
             if not isinstance(rt, dict):
                 continue
             rates = rt.get("rates") or []
-            rname = rates[0].get("name") if rates and isinstance(rates[0], dict) else "N/A"
+            rname = (
+                rates[0].get("name") if rates and isinstance(rates[0], dict) else "N/A"
+            )
             offer = rt.get("offerRetailRate") or {}
             amount = offer.get("amount")
             if amount is None:
@@ -212,7 +246,7 @@ def find_cost_of_living(city: str, country: str) -> str:
 
     headers = {
         "x-rapidapi-key": os.getenv("RAPID_API_KEY"),
-        "x-rapidapi-host": "cost-of-living-and-prices.p.rapidapi.com"
+        "x-rapidapi-host": "cost-of-living-and-prices.p.rapidapi.com",
     }
 
     log.info("find_cost_of_living: city=%s, country=%s", city, country)

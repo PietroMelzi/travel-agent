@@ -29,20 +29,29 @@ def create_agent(multi_agent_specs: dict, agent_key: str) -> Agent:
     agent_specs = multi_agent_specs[agent_key]
     log.info("Creating agent: %s", agent_specs.get("name", agent_key))
 
-    agents_as_tools = [create_agent(multi_agent_specs, key) for key in agent_specs.get("agents_as_tools", [])]
-    agents_as_tools = [tool.as_tool(
-        tool_name=_sanitize_tool_name(tool.name),
-        tool_description=multi_agent_specs[key]["description"]
-    ) for key, tool in zip(agent_specs.get("agents_as_tools", []), agents_as_tools)]
-    
-    handoffs = [create_agent(multi_agent_specs, agent_key) for agent_key in agent_specs.get("handoffs", [])]
+    agents_as_tools = [
+        create_agent(multi_agent_specs, key)
+        for key in agent_specs.get("agents_as_tools", [])
+    ]
+    agents_as_tools = [
+        tool.as_tool(
+            tool_name=_sanitize_tool_name(tool.name),
+            tool_description=multi_agent_specs[key]["description"],
+        )
+        for key, tool in zip(agent_specs.get("agents_as_tools", []), agents_as_tools)
+    ]
+
+    handoffs = [
+        create_agent(multi_agent_specs, agent_key)
+        for agent_key in agent_specs.get("handoffs", [])
+    ]
 
     tools = agent_specs.get("tools", [])
     tools = [map_tool_name_to_function[tool] for tool in tools]
-    
+
     return Agent(
         name=agent_specs["name"],
         instructions=agent_specs["instructions"],
         tools=agents_as_tools + tools,
-        handoffs=handoffs
+        handoffs=handoffs,
     )

@@ -20,13 +20,12 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 try:
-    weave.init('travel-agent')
+    weave.init("travel-agent")
 except Exception as e:
     log.warning("Weave init skipped: %s", e)
 
-def build_message_with_history(
-    history: deque[tuple[str, str]], new_input: str
-) -> str:
+
+def build_message_with_history(history: deque[tuple[str, str]], new_input: str) -> str:
     """Build the message to send to the LLM: current time, last 5 turns, and the new user input."""
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     parts = [f"Current time: {now}"]
