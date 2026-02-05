@@ -2,6 +2,10 @@
 
 A travel assistant that helps with flights, hotels, cost of living, and more.
 
+## Try it
+
+Available in Streamlit Cloud at [https://travel-agent-bot.streamlit.app/](https://travel-agent-bot.streamlit.app/)
+
 ## Setup the Environment
 
 Add a `.env` file in the project root with:
