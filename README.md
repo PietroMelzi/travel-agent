@@ -1,6 +1,6 @@
 # Travel Agent
 
-A travel assistant that helps with flights, hotels, cost of living, and more.
+A travel assistant that helps with flights, hotels, cost of living, and more. Unlike off-the-shelf LLMs, it provides exact prices and specific travel dates in its responses.
 
 ## Try it
 
